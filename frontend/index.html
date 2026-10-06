@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HelpMed — Triagem de Saúde Pública</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- MENU LATERAL -->
+    <nav class="sidebar">
+        <div class="logo">
+            <h2>HelpMed</h2>
+            <span>Triagem Manchester</span>
+        </div>
+        <ul class="menu">
+            <li class="menu-item active" data-page="triagem">
+                <span class="icon">🏥</span> Nova Triagem
+            </li>
+            <li class="menu-item" data-page="fila">
+                <span class="icon">👥</span> Fila de Espera
+                <span class="badge" id="badge-fila">0</span>
+            </li>
+            <li class="menu-item" data-page="atendimento">
+                <span class="icon">💊</span> Atendimento
+            </li>
+            <li class="menu-item" data-page="historico">
+                <span class="icon">📋</span> Histórico
+                <span class="badge badge-gray" id="badge-historico">0</span>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="content">
+
+        <!-- PÁGINA: TRIAGEM -->
+        <section class="page active" id="page-triagem">
+            <h1>Nova Triagem</h1>
+            <p class="subtitle">Preencha os dados e o sistema classifica a prioridade automaticamente.</p>
+
+            <div class="form-card">
+                <div class="form-group">
+                    <label>Nome do paciente</label>
+                    <input type="text" id="input-nome" placeholder="Nome completo">
+                </div>
+
+                <div class="form-group">
+                    <label>Sintomas relatados</label>
+                    <textarea id="input-sintomas" placeholder="Descreva os sintomas"></textarea>
+                </div>
+
+                <h3>Questionário de Triagem</h3>
+
+                <div class="triagem-perguntas">
+                    <div class="pergunta">
+                        <label>O paciente está inconsciente?</label>
+                        <div class="toggle-group">
+                            <button class="toggle-btn" data-campo="inconsciente" data-valor="true">Sim</button>
+                            <button class="toggle-btn selected" data-campo="inconsciente" data-valor="false">Não</button>
+                        </div>
+                    </div>
+                    <div class="pergunta">
+                        <label>Dificuldade severa para respirar?</label>
+                        <div class="toggle-group">
+                            <button class="toggle-btn" data-campo="dificuldade_respirar" data-valor="true">Sim</button>
+                            <button class="toggle-btn selected" data-campo="dificuldade_respirar" data-valor="false">Não</button>
+                        </div>
+                    </div>
+                    <div class="pergunta">
+                        <label>Hemorragia intensa?</label>
+                        <div class="toggle-group">
+                            <button class="toggle-btn" data-campo="hemorragia" data-valor="true">Sim</button>
+                            <button class="toggle-btn selected" data-campo="hemorragia" data-valor="false">Não</button>
+                        </div>
+                    </div>
+                    <div class="pergunta">
+                        <label>Dor no peito?</label>
+                        <div class="toggle-group">
+                            <button class="toggle-btn" data-campo="dor_peito" data-valor="true">Sim</button>
+                            <button class="toggle-btn selected" data-campo="dor_peito" data-valor="false">Não</button>
+                        </div>
+                    </div>
+                    <div class="pergunta">
+                        <label>Fratura exposta ou trauma grave?</label>
+                        <div class="toggle-group">
+                            <button class="toggle-btn" data-campo="trauma_grave" data-valor="true">Sim</button>
+                            <button class="toggle-btn selected" data-campo="trauma_grave" data-valor="false">Não</button>
+                        </div>
+                    </div>
+                    <div class="pergunta">
+                        <label>Temperatura corporal (°C)</label>
+                        <input type="number" id="input-temperatura" value="36.5" min="35" max="42" step="0.1">
+                    </div>
+                    <div class="pergunta">
+                        <label>Nível de dor (0 a 10)</label>
+                        <input type="range" id="input-dor" min="0" max="10" value="0">
+                        <span class="dor-valor" id="dor-valor">0</span>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" id="btn-registrar">Registrar Paciente</button>
+            </div>
+
+            <!-- Resultado da triagem -->
+            <div class="resultado-triagem hidden" id="resultado-triagem">
+                <div class="resultado-card" id="resultado-card">
+                    <h3>Paciente Registrado</h3>
+                    <p id="resultado-nome"></p>
+                    <p id="resultado-protocolo"></p>
+                    <p id="resultado-cor"></p>
+                    <p id="resultado-tempo"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- PÁGINA: FILA -->
+        <section class="page" id="page-fila">
+            <h1>Fila de Espera</h1>
+            <p class="subtitle">Pacientes aguardando atendimento, ordenados por urgência.</p>
+            <div id="lista-fila" class="fila-container">
+                <p class="vazio">Nenhum paciente na fila.</p>
+            </div>
+        </section>
+
+        <!-- PÁGINA: ATENDIMENTO -->
+        <section class="page" id="page-atendimento">
+            <h1>Atendimento</h1>
+            <p class="subtitle">Consulta em andamento.</p>
+
+            <!-- Sem paciente -->
+            <div id="sem-paciente" class="card-vazio">
+                <p>Nenhum paciente em atendimento.</p>
+                <button class="btn btn-primary" id="btn-chamar">Chamar Próximo da Fila</button>
+            </div>
+
+            <!-- Com paciente -->
+            <div id="com-paciente" class="hidden">
+                <div class="paciente-card" id="paciente-atendimento-card">
+                    <div class="paciente-info">
+                        <h3 id="atend-nome"></h3>
+                        <span class="tag" id="atend-cor"></span>
+                        <p id="atend-protocolo"></p>
+                        <p id="atend-sintomas"></p>
+                    </div>
+                </div>
+
+                <div class="acoes-section">
+                    <h3>Ações do Atendimento</h3>
+                    <div class="acao-input">
+                        <input type="text" id="input-acao" placeholder="Ex: Diagnóstico: gripe, Medicação: dipirona...">
+                        <button class="btn btn-primary" id="btn-acao">Registrar</button>
+                        <button class="btn btn-warning" id="btn-undo">Desfazer</button>
+                    </div>
+                    <ul id="lista-acoes" class="acoes-lista"></ul>
+                </div>
+
+                <button class="btn btn-success" id="btn-finalizar">Finalizar Atendimento</button>
+            </div>
+        </section>
+
+        <!-- PÁGINA: HISTÓRICO -->
+        <section class="page" id="page-historico">
+            <h1>Histórico de Atendimentos</h1>
+            <p class="subtitle">Todos os pacientes já atendidos.</p>
+
+            <div class="busca-section">
+                <input type="text" id="input-busca" placeholder="Buscar por nome ou protocolo (ex: HC-0001)">
+                <button class="btn btn-primary" id="btn-buscar">Buscar</button>
+                <button class="btn btn-secondary" id="btn-ver-todos">Ver Todos</button>
+            </div>
+
+            <div id="lista-historico" class="historico-container">
+                <p class="vazio">Nenhum atendimento registrado.</p>
+            </div>
+        </section>
+
+    </main>
+
+        <!-- MODAL DE CONFIRMAÇÃO/ALERTA -->
+    <div class="modal-overlay hidden" id="modal-overlay">
+        <div class="modal-box">
+            <p id="modal-texto"></p>
+            <div class="modal-botoes">
+                <button class="btn btn-primary" id="modal-ok">OK</button>
+                <button class="btn btn-secondary hidden" id="modal-cancelar">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
